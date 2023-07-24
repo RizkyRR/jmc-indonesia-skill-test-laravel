@@ -46,6 +46,12 @@
   href="{{ asset('admin-assets/libs/datatables/jquery-datatables-checkboxes-1.2.12/css/dataTables.checkboxes.css') }}">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
+<style>
+  .menu-action-datatable {
+    position: relative;
+    z-index: 9999999 !important;
+  }
+</style>
 <!-- Page CSS -->
 
 <!-- Helpers -->

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\RegionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Province Route Access
+Route::post('/province/get-province-by-select2', [ProvinceController::class, 'getProvinceBySelect2'])->name('get-province-by-select2');
+Route::get('/province/delete/{id}', [ProvinceController::class, 'destroy']);
+Route::resource("province", ProvinceController::class);
+
+// Region Route Access
+Route::post('/region/get-region-by-select2', [RegionController::class, 'getRegionBySelect2'])->name('get-region-by-select2');
+Route::get('/region/delete/{id}', [RegionController::class, 'destroy']);
+Route::resource("region", RegionController::class);

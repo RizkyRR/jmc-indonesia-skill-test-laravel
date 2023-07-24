@@ -24,7 +24,7 @@
       <!-- Layout container -->
       <div class="layout-page">
         <!-- Navbar -->
-        @include('includes.header')
+        {{-- @include('includes.header') --}}
         <!-- / Navbar -->
 
         <!-- Content wrapper -->
