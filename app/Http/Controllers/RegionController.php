@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Province;
 use App\Models\Region;
+use PDF;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -21,15 +22,15 @@ class RegionController extends Controller
   public function index(Request $request)
   {
     if (request()->ajax()) {
-      $datas = Region::with('province');
+      $datas = Region::join('provinces', 'regions.province_id', '=', 'provinces.id')
+        ->select('regions.*')
+        ->with('province');
 
       if (!empty($request->get('province_id'))) {
-        $datas = $datas->where(function ($query) use ($request) {
-          $query->where('province_id', $request->get('province_id'));
-        });
+        $datas = $datas->where('regions.province_id', $request->get('province_id'));
       }
 
-      $datas = $datas->get()->sortBy('region.name_province');
+      $datas = $datas->orderBy('provinces.name_province')->get();
 
       return DataTables::of($datas)
         ->filter(function ($instance) use ($request) {
@@ -295,5 +296,52 @@ class RegionController extends Controller
 
   public function exportPdf(Request $request)
   {
+    // Mengurai (parse) parameter 'arrUrl' dari JSON string menjadi array
+    $arrUrl = json_decode($request->input('arrUrl'), true);
+
+    $datas = Region::orderBy('created_at', 'desc')
+      ->with('province');
+
+    $datas = Region::join('provinces', 'regions.province_id', '=', 'provinces.id')
+      ->select('regions.*')
+      ->with('province');
+
+    if (isset($arrUrl)) {
+      if (!empty($arrUrl['search'])) {
+        $datas = $datas->where(function ($query) use ($request, $arrUrl) {
+          $query->where('regions.name_region', 'like', '%' . $arrUrl['search'] . '%');
+        });
+      }
+
+      if (!empty($arrUrl['province_id'])) {
+        $datas = $datas->where(function ($query) use ($request,  $arrUrl) {
+          $query->where('regions.province_id', $arrUrl['province_id']);
+        });
+      }
+    }
+
+    $datas = $datas->orderBy('provinces.name_province')->get();
+
+
+    $total_populasi_keseluruhan = 0;
+
+    // cek dulu ada data provisnsi atau tidak
+    if (count($datas) > 0) {
+
+      foreach ($datas as $key => $item) {
+        $total_populasi_keseluruhan += $item->total_population_region;
+      }
+    }
+
+    $title = "Laporan Total Populasi Seluruh Region";
+
+
+    $pdf = PDF::loadview('pages.region.export-pdf', [
+      'datas' => $datas,
+      'title' => $title,
+      'total_populasi_keseluruhan' => $total_populasi_keseluruhan
+    ]);
+
+    return $pdf->stream('laporan-region-pdf');
   }
 }

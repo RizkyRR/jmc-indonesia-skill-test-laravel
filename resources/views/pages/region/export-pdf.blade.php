@@ -65,6 +65,7 @@
       <tr>
         <th>No</th>
         <th>Nama Provinsi</th>
+        <th>Nama Region</th>
         <th>Jumlah Penduduk</th>
       </tr>
     </thead>
@@ -81,22 +82,26 @@
             <td>{{ ++$row_number }}</td>
 
             <td>
-              {{ $item['name_province'] }}
+              {{ $item->province->name_province }}
             </td>
 
             <td>
-              {{ $item['total_population'] }}
+              {{ $item->name_region }}
+            </td>
+
+            <td>
+              {{ $item->total_population_region }}
             </td>
           </tr>
         @endforeach
 
         <tr>
-          <td colspan="2" style="text-align: center; font-weight: bold">Total Keseluruhan</td>
+          <td colspan="3" style="text-align: center; font-weight: bold">Total Keseluruhan</td>
           <td>{{ $total_populasi_keseluruhan }}</td>
         </tr>
       @else
         <tr>
-          <td colspan="3">Data Tidak Tersedia</td>
+          <td colspan="4">Data Tidak Tersedia</td>
         </tr>
       @endif
 
