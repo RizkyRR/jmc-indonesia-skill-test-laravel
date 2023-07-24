@@ -57,7 +57,7 @@
 
   <ul class="menu-inner py-1">
     <!-- Dashboard -->
-    <li class="menu-item">
+    <li class="menu-item {{ activeMenu('/') }}">
       <a href="{{ route('home') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-home-circle"></i>
         <div data-i18n="Analytics">Dashboard</div>
@@ -68,14 +68,14 @@
       <span class="menu-header-text">Main Menus</span>
     </li>
 
-    <li class="menu-item">
+    <li class="menu-item {{ activeMenu('province') }}">
       <a href="{{ route('province.index') }}" class="menu-link">
         <i class="menu-icon fas fa-circle"></i>
         <div data-i18n="Analytics">Provinces</div>
       </a>
     </li>
 
-    <li class="menu-item">
+    <li class="menu-item {{ activeMenu('region') }}">
       <a href="{{ route('region.index') }}" class="menu-link">
         <i class="menu-icon fas fa-circle"></i>
         <div data-i18n="Analytics">Regions</div>
