@@ -20,10 +20,15 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Province Route Access
 Route::post('/province/get-province-by-select2', [ProvinceController::class, 'getProvinceBySelect2'])->name('get-province-by-select2');
+
+Route::get('/province/export-pdf', [ProvinceController::class, 'exportPdf'])->name('province.export-pdf');
+
 Route::get('/province/delete/{id}', [ProvinceController::class, 'destroy']);
 Route::resource("province", ProvinceController::class);
 
 // Region Route Access
 Route::post('/region/get-region-by-select2', [RegionController::class, 'getRegionBySelect2'])->name('get-region-by-select2');
+Route::get('/region/export-pdf', [RegionController::class, 'exportPdf'])->name('region.export-pdf');
+Route::get('/region/export-pdf-by-region/{id}', [RegionController::class, 'exportPdfByRegion'])->name('region.export-pdf-by-region');
 Route::get('/region/delete/{id}', [RegionController::class, 'destroy']);
 Route::resource("region", RegionController::class);

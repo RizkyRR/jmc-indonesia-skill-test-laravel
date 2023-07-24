@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Province;
 use App\Models\Region;
+use App\Models\Province;
+use PDF;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -42,7 +43,7 @@ class ProvinceController extends Controller
           $btn_edit = '<a class="dropdown-item" href="' . route('province.edit', $data->id) . '"><i class="fas fa-pencil-alt me-1"></i> Edit</a>';
 
           //delete
-          $btn_hapus = '<a class="dropdown-item btn-hapus" href="javascript:void(0)" data-id="' . $data->id  . '" data-nama="' . $data->name_province . '"><i class="fas fa-trash-alt me-1"></i> Hapus</a>';
+          $btn_hapus = '<a class="dropdown-item btn-hapus text-danger" href="javascript:void(0)" data-id="' . $data->id  . '" data-nama="' . $data->name_province . '"><i class="fas fa-trash-alt me-1"></i> Hapus</a>';
 
 
 
@@ -114,9 +115,12 @@ class ProvinceController extends Controller
       DB::beginTransaction();
 
       try {
+        // chek terlebih dahulu apakah ada nama provinsi yang sama
+        // mencari kesamaan dengan where like agar meminimalisisr kesamaan
         $item_check_province = Province::where('name_province', 'like', '%' . $request->name_province . '%')
           ->first();
 
+        // jika ada maka lempar false selain true masuk proses
         if ($item_check_province) {
           return response()->json([
             'status' => false,
@@ -199,9 +203,12 @@ class ProvinceController extends Controller
       DB::beginTransaction();
 
       try {
+        // pastikan id provinsi ada dan sesuai dengan yang akan diupdate
         $check_exist_province = Province::findOrFail($id);
 
+        // logic ketika user mengubah data provinsi berbeda dengan isian aslinya untuk dicek dengan data lainnya
         if ($check_exist_province->name_province != $request->name_province) {
+          // mencari kesamaan dengan where like agar meminimalisisr kesamaan
           $is_relate = Province::where('name_province', 'like', '%' . $request->name_province . '%')
             ->first();
 
@@ -258,6 +265,7 @@ class ProvinceController extends Controller
 
     $item_province = $query_province->first();
 
+    // hapus region juga jika indukan yaitu provinsi dihapus
     Region::where('province_id', $item_province->id)->delete();
 
     $hapus = $query_province->delete();
@@ -298,5 +306,51 @@ class ProvinceController extends Controller
     }
 
     return response()->json($response);
+  }
+
+  public function exportPdf(Request $request)
+  {
+    $datas = Province::orderBy('created_at', 'desc')
+      ->with('region')
+      ->get();
+
+    // mendapatkan data total population di controller memminimalisir menggunakan query di view
+    $generate_datas = [];
+    $total_populasi_keseluruhan = 0;
+
+    // cek dulu ada data provisnsi atau tidak
+    if (count($datas) > 0) {
+      $item_province = [];
+
+      foreach ($datas as $key => $item) {
+        $item_province['name_province'] = $item->name_province;
+
+        $total_population = 0;
+
+        if (count($item->region) > 0) {
+          foreach ($item->region as $key_region => $item_region) {
+            $total_population += $item_region->total_population_region;
+          }
+        }
+
+        $item_province['total_population'] = $total_population;
+        $total_populasi_keseluruhan += $total_population;
+
+        array_push($generate_datas, $item_province);
+      }
+    } else {
+      $generate_datas = [];
+    }
+
+    $title = "Laporan Total Populasi Seluruh Provinsi";
+
+
+    $pdf = PDF::loadview('pages.province.export-pdf', [
+      'datas' => $generate_datas,
+      'title' => $title,
+      'total_populasi_keseluruhan' => $total_populasi_keseluruhan
+    ]);
+
+    return $pdf->stream('laporan-province-pdf');
   }
 }

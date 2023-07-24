@@ -22,13 +22,28 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Province Data</h5>
+        <div class="card-header">
+          <div class="row ms-2 me-3">
+            <div class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+              <h5 class="mb-0">Province Data</h5>
+            </div>
 
-          <a href="{{ route('province.create') }}" class="btn btn-primary btn-icon-text">
-            <i class="fa fa-plus btn-icon-prepend"></i>
-            Tambah
-          </a>
+            <div
+              class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+              <div class="ms-auto">
+                <a id="pdf-link" href="{{ route('province.export-pdf') }}"
+                  class="btn btn-secondary btn-icon-text order-0" target="__blank">
+                  <i class="fas fa-file-pdf btn-icon-prepend"></i>
+                  Export Pdf
+                </a>
+
+                <a href="{{ route('province.create') }}" class="btn btn-primary btn-icon-text">
+                  <i class="fa fa-plus btn-icon-prepend"></i>
+                  Tambah
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="card-body">
